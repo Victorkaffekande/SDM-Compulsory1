@@ -13,6 +13,11 @@ public class ReviewService : IReviewService
 
     public int GetNumberOfReviewsFromReviewer(int reviewer)
     {
+        if (reviewer <=0)
+        {
+            throw new ArgumentException("Id can not be negative or 0");
+        }
+
         List<BeReview> allBeReviews = _repo.GetAllBeReviews();
         int count = 0;
         foreach (var review in allBeReviews)
