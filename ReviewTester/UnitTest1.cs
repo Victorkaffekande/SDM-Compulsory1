@@ -1,5 +1,6 @@
 using Moq;
 using SDM_Compulsory1.Interface;
+using SDM_Compulsory1.Model;
 using SDM_Compulsory1.Service;
 
 namespace ReviewTester;
@@ -8,7 +9,7 @@ public class UnitTest1
 {
 
     [Fact]
-    public void CreateReviewService()
+    public void CreateReviewService() // test case 1.1
     {
         //Arange
         Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
@@ -20,20 +21,30 @@ public class UnitTest1
     }
     
     
-    /**
-     * 
      
-    [Fact]
-    public void GetNumberOfReviewsFromValidReviewer(int reviewer)
+    [Theory]
+    [InlineData(1, 2)] // test case 2.1
+    [InlineData(3, 1)] // test case 2.2
+    [InlineData(2, 0)] // test case 2.3
+    public void GetNumberOfReviewsFromValidReviewer(int reviewer, int expectedResult)
     {
-        //Arrange
-        
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = new List<BeReview>();
+        data.Add(new BeReview(){Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now});
+        data.Add(new BeReview(){Reviewer = 1, Movie = 4, Grade = 4, ReviewDate = DateTime.Now});
+        data.Add(new BeReview(){Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now});
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+
+        //
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
         
         //Act
-        
-        
+        int result = service.GetNumberOfReviewsFromReviewer(reviewer);
         //Assert
+        Assert.True(result.Equals(expectedResult));
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
     
-    */
 }
