@@ -91,12 +91,21 @@ public class ReviewService : IReviewService
             count++;
         }
 
+        if (count == 0) return 0;
         return total / count;
     }
 
     public int GetNumberOfRates(int movie, int rate)
     {
-        throw new NotImplementedException();
+        if (movie <= 0) throw new ArgumentException("MovieId can not be negative or zero");
+
+
+        if (rate <= 0 || rate > 5) throw new ArgumentException("Rate must be between 1 and 5");
+
+
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+
+        return allBeReviews.FindAll(beReview => beReview.Movie.Equals(movie) && beReview.Grade.Equals(rate)).Count;
     }
 
     public List<int> GetMoviesWithHighestNumberOfTopRates()

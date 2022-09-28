@@ -187,7 +187,6 @@ public class UnitTest1
     [InlineData(2, 4.5)] 
     [InlineData(5, 0)] 
     public void GetAverageRateOfMovieTest(int movie, double expectedResult)
-
     {
         //Arange
         //FAKE DB simulation
@@ -206,8 +205,47 @@ public class UnitTest1
         Assert.Equal(expectedResult, result);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
-    
-    
-    
 
+    [Theory]
+    [InlineData(2,4,2)]
+    [InlineData(1,3,0)]
+    [InlineData(1,2,1)]
+    public void GetNumberOfValidRates(int movie,int rate,int expected)
+    {
+        //arrange
+        List<BeReview> data = new List<BeReview>();
+        data.Add(new BeReview() { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 4, Movie = 2, Grade = 4, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now });
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        //act
+        int result = service.GetNumberOfRates(movie,rate);
+        
+        //assert
+        Assert.Equal(expected, result);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+    }
+    
+    [Theory]
+    [InlineData(0,4,"MovieId can not be negative or zero")]//invalid movie
+    [InlineData(-1,4,"MovieId can not be negative or zero")]//invalid movie
+    [InlineData(1,0,"Rate must be between 1 and 5")]//invalid rate low
+    [InlineData(1,6,"Rate must be between 1 and 5")]//invalid rate high
+    public void GetNumberOfInvalidRates(int movie,int rate,String expected)
+    {
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+
+        //act
+        Action action = ()=> service.GetNumberOfRates(movie,rate);
+        
+        //assert
+        var ex = Assert.Throws<ArgumentException>(action);
+        Assert.Equal(expected, ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
+    }
 }
