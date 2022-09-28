@@ -26,7 +26,6 @@ public class ReviewService : IReviewService
             {
                 count++;
             }
-            
         }
 
         return count;
@@ -34,7 +33,25 @@ public class ReviewService : IReviewService
 
     public double GetAverageRateFromReviewer(int reviewer)
     {
-        throw new NotImplementedException();
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+        List<BeReview> allReviewByReviewer = allBeReviews.FindAll(beReview => beReview.Reviewer.Equals(reviewer));
+        double totalGrade = 0;
+        double counter = 0;
+
+        if (allReviewByReviewer.Count <= 0)
+        {
+            throw new KeyNotFoundException("Reviewer does not exist");
+        }
+        
+        foreach (var review in allReviewByReviewer)
+        {
+            if (review.Reviewer.Equals(reviewer))
+            {
+                totalGrade += review.Grade;
+                counter++;
+            }
+        }
+        return totalGrade / counter;
     }
 
     public int GetNumberOfRatesByReviewer(int reviewer, int rate)

@@ -12,5 +12,6 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f3df804e_002D597f_002D49f1_002D956d_002Db0f552f78bd6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreateReviewService #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::99069E3D-002B-4FBB-B42B-5BD89925C5DE::net6.0::ReviewTester.UnitTest1.CreateReviewService&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::99069E3D-002B-4FBB-B42B-5BD89925C5DE::net6.0::ReviewTester.UnitTest1.GetAverageRateFromValidReviewer&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
