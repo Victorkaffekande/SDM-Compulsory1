@@ -97,25 +97,117 @@ public class UnitTest1
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
     
-    [Fact]
+    [Fact] // 3.4
     public void GetAverageRateFromInvalidReviewer()
     {
         //Arange
         //FAKE DB simulation
-        List<BeReview> data = new List<BeReview>();
-        data.Add(new BeReview(){Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now});
-        data.Add(new BeReview(){Reviewer = 1, Movie = 4, Grade = 4, ReviewDate = DateTime.Now});
-        data.Add(new BeReview(){Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now});
-        data.Add(new BeReview(){Reviewer = 10, Movie = 23232, Grade = 0, ReviewDate = DateTime.Now});
         Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
         ReviewService service = new ReviewService(mockRepo.Object);
-        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
-        int reviewer = 5;
+        int reviewer = -1;
         //Act
         Action action = () => service.GetAverageRateFromReviewer(reviewer);
         //Assert
         var ex = Assert.Throws<KeyNotFoundException>(action);
-        Assert.Equal("Reviewer does not exist",ex.Message);
+        Assert.Equal("Reviewer can not be negative",ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
+    }
+    
+    [Theory]
+    [InlineData(1,2, 0)] // test case 4.1
+    [InlineData(1,4 ,2)] // test case 4.2
+    [InlineData(3,2 ,1)] // test case 4.3
+    public void GetNumberOfRatesByValidReviewer(int reviewer,int rate, int expectedResult)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = new List<BeReview>();
+        data.Add(new BeReview(){Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now});
+        data.Add(new BeReview(){Reviewer = 1, Movie = 4, Grade = 4, ReviewDate = DateTime.Now});
+        data.Add(new BeReview(){Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now});
+        
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        //Act
+        int result = service.GetNumberOfRatesByReviewer(reviewer, rate);
+        //Assert
+        Assert.Equal(expectedResult, result);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
+    
+    [Theory]
+    [InlineData(1,0, "Rate must between 1 & 5" )]  // to low rate
+    [InlineData(1,6, "Rate must between 1 & 5")] // to high rate
+    [InlineData(-1,2 ,"Reviewer can not be negative")] // reviewer doesnt exist
+    public void GetNumberOfRatesByReviewerInvalidRequest(int reviewer,int rate, string expectedMessage)
+    {
+        //Arange
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+
+        Action action = () => service.GetNumberOfRatesByReviewer(reviewer,rate);
+        //Assert
+        var ex = Assert.Throws<ArgumentException>(action);
+        Assert.Equal(expectedMessage,ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
+    }
+
+
+    [Theory]
+    [InlineData(1, 1)] 
+    [InlineData(2, 2)] 
+    [InlineData(5, 0)] 
+    
+    public void GetNumberOfReviewsFromValidMovie(int movie, int expectedResult)
+
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = new List<BeReview>();
+        data.Add(new BeReview() { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now });
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+
+        int result = service.GetNumberOfReviews(movie);
+        //Assert
+        
+        Assert.Equal(expectedResult, result);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+    }
+    
+    
+    [Theory]
+    [InlineData(1, 2)] 
+    [InlineData(2, 4.5)] 
+    [InlineData(5, 0)] 
+    public void GetAverageRateOfMovieTest(int movie, double expectedResult)
+
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = new List<BeReview>();
+        data.Add(new BeReview() { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now });
+        data.Add(new BeReview() { Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now });
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+
+        double result = service.GetAverageRateOfMovie(movie);
+        //Assert
+        
+        Assert.Equal(expectedResult, result);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+    }
+    
+    
+    
+
 }

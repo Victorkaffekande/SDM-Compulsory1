@@ -6,6 +6,7 @@ namespace SDM_Compulsory1.Service;
 public class ReviewService : IReviewService
 {
     public IReviewRepository _repo;
+
     public ReviewService(IReviewRepository repository)
     {
         _repo = repository;
@@ -13,7 +14,7 @@ public class ReviewService : IReviewService
 
     public int GetNumberOfReviewsFromReviewer(int reviewer)
     {
-        if (reviewer <=0)
+        if (reviewer <= 0)
         {
             throw new ArgumentException("Id can not be negative or 0");
         }
@@ -33,16 +34,17 @@ public class ReviewService : IReviewService
 
     public double GetAverageRateFromReviewer(int reviewer)
     {
+        if (reviewer <= 0)
+        {
+            throw new KeyNotFoundException("Reviewer can not be negative");
+        }
+
         List<BeReview> allBeReviews = _repo.GetAllBeReviews();
         List<BeReview> allReviewByReviewer = allBeReviews.FindAll(beReview => beReview.Reviewer.Equals(reviewer));
         double totalGrade = 0;
         double counter = 0;
 
-        if (allReviewByReviewer.Count <= 0)
-        {
-            throw new KeyNotFoundException("Reviewer does not exist");
-        }
-        
+
         foreach (var review in allReviewByReviewer)
         {
             if (review.Reviewer.Equals(reviewer))
@@ -51,22 +53,45 @@ public class ReviewService : IReviewService
                 counter++;
             }
         }
+
         return totalGrade / counter;
     }
 
     public int GetNumberOfRatesByReviewer(int reviewer, int rate)
     {
-        throw new NotImplementedException();
+        if (reviewer <= 0) throw new ArgumentException("Reviewer can not be negative");
+
+
+        if (rate <= 0 || rate >= 6) throw new ArgumentException("Rate must between 1 & 5");
+
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+        List<BeReview> allReviewByReviewer =
+            allBeReviews.FindAll(beReview => beReview.Reviewer.Equals(reviewer) && beReview.Grade.Equals(rate));
+
+
+        return allReviewByReviewer.Count;
     }
 
     public int GetNumberOfReviews(int movie)
     {
-        throw new NotImplementedException();
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+        return allBeReviews.FindAll(beReview => beReview.Movie.Equals(movie)).Count;
     }
 
     public double GetAverageRateOfMovie(int movie)
     {
-        throw new NotImplementedException();
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+        allBeReviews = allBeReviews.FindAll(beReview => beReview.Movie.Equals(movie));
+
+        double total = 0;
+        double count = 0;
+        foreach (var beReviews in allBeReviews)
+        {
+            total += beReviews.Grade;
+            count++;
+        }
+
+        return total / count;
     }
 
     public int GetNumberOfRates(int movie, int rate)
