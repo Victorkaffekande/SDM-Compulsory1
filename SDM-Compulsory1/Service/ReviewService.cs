@@ -1,4 +1,5 @@
-﻿using SDM_Compulsory1.Interface;
+﻿using System.Collections.Concurrent;
+using SDM_Compulsory1.Interface;
 using SDM_Compulsory1.Model;
 
 namespace SDM_Compulsory1.Service;
@@ -145,7 +146,29 @@ public class ReviewService : IReviewService
 
     public List<int> GetMostProductiveReviewers()
     {
-        throw new NotImplementedException();
+        List<BeReview> allReviews = _repo.GetAllBeReviews();
+        var reviewerList = allReviews.Select(x => x.Reviewer).Distinct();
+        ConcurrentDictionary<int, int> map = new ConcurrentDictionary<int, int>();
+
+        foreach (var r in reviewerList)
+        {
+            var count = allReviews.Where(x => x.Reviewer == r).Select(x => x).Count();
+            map.TryAdd(r,count);
+        }
+        
+        List<int> countList = new List<int>(map.Keys);
+        countList.Sort();
+        countList.Reverse();
+        List<int> resultList = new List<int>();
+        var highestCount = map[countList[0]];
+        foreach (var r in map.Keys)
+        {
+            if (map[r] == highestCount)
+            {
+                resultList.Add(r);
+            }
+        }
+        return resultList;
     }
 
     public List<int> GetTopRatedMovies(int amount)
