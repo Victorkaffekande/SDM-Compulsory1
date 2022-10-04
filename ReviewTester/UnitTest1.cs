@@ -267,7 +267,7 @@ public class UnitTest1
         //Assert
         result.Sort();
         expectedresult.Sort();
-        Assert.Equal(result,expectedresult);
+        Assert.Equal(expectedresult,result);
         Assert.True(result.Count == expectedresult.Count);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
@@ -294,7 +294,7 @@ public class UnitTest1
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 3, Movie = 5, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 4, Movie = 5, Grade = 5, ReviewDate = DateTime.Now }}),
-                new List<int>(new[] { 5, 4 })        
+                new List<int>(new[] { 2, 5 })        
                 
         };
         

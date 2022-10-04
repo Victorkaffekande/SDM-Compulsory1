@@ -111,37 +111,36 @@ public class ReviewService : IReviewService
     public List<int> GetMoviesWithHighestNumberOfTopRates()
     {
         List<BeReview> allBeReviews = _repo.GetAllBeReviews();
-        allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
-        List<int> onlyMovies = new List<int>();
-        foreach (var beReview in allBeReviews)
-        {
-            onlyMovies.Add(beReview.Movie);
-        }
+         allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
 
-        
-        List<int> topRatedMovies = new List<int>();
-        int mostRatedMovie = onlyMovies.GroupBy(i=>i).OrderByDescending(grp=>grp.Count())
-            .Select(grp=>grp.Key).First();
-        
-        topRatedMovies.Add(mostRatedMovie);
-        onlyMovies.Remove(mostRatedMovie);
-        
+         List<int> movieIdList = new List<int>();
+         foreach (var review in allBeReviews)
+         {
+             if (!movieIdList.Contains(review.Movie))
+             {
+                 movieIdList.Add(review.Movie);
+             }
+         }
+         int count = 0;
+         int biggestMovie = 0;
+         List<int> bestMovies = new List<int>();
+         
+         foreach (var movie in movieIdList)
+         {
+             count = allBeReviews.FindAll(bereview => bereview.Movie.Equals(movie)).Count;
 
-        int movieId = 0;
-        while (onlyMovies.Count !=0 )
-        {
-            movieId = onlyMovies.GroupBy(i=>i).OrderByDescending(grp=>grp.Count())
-                .Select(grp=>grp.Key).First();
+             if (count > biggestMovie)
+             {
+                 biggestMovie = count;
+                 bestMovies.Clear();
+                 bestMovies.Add(movie);
+             }else if (count == biggestMovie)
+             {
+                 bestMovies.Add(movie);
+             }
+         }
 
-            if (movieId == mostRatedMovie)
-            {
-                topRatedMovies.Add(movieId);
-                onlyMovies.Remove(movieId);
-            }else
-                break;
-        }
-
-        return topRatedMovies;
+         return bestMovies;
     }
 
     public List<int> GetMostProductiveReviewers()
