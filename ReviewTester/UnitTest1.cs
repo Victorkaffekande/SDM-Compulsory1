@@ -342,11 +342,52 @@ public class UnitTest1
                 new List<int>(new[] { 2, 5 })        
                 
         };
-        
-        
     }
     
     
+    
+    [Theory]
+    [MemberData(nameof(GetTopRatedMoviesData))]
+    public void GetTopRatedMovies(List<BeReview> fakeRepo, List<int> amount,List<int> expectedresult)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = fakeRepo;
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        List<int> result = service.GetTopRatedMovies(amount[0]);
+        //Assert
+        result.Sort();
+        expectedresult.Sort();
+        Assert.Equal(expectedresult,result);
+        Assert.True(result.Count == expectedresult.Count);
+        
+    }
+    public static IEnumerable<Object> GetTopRatedMoviesData()
+    {
+        
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 5, Grade = 3, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{1}),
+            new List<int>(new []{2})
+        };
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 5, Movie = 1, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 3, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 5, Grade = 2, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{2}),
+            new List<int>(new[] { 1, 3 })        
+                
+        };
+    }
     
     
     

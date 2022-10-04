@@ -1,5 +1,7 @@
+
 ﻿using System.Collections.Concurrent;
-using SDM_Compulsory1.Interface;
+ using System.Collections.Immutable;
+ using SDM_Compulsory1.Interface;
 using SDM_Compulsory1.Model;
 
 namespace SDM_Compulsory1.Service;
@@ -173,7 +175,30 @@ public class ReviewService : IReviewService
 
     public List<int> GetTopRatedMovies(int amount)
     {
-        throw new NotImplementedException();
+
+        List<BeReview> allBereviews = _repo.GetAllBeReviews();
+        var movieList = allBereviews.Select(x => x.Movie).Distinct();
+
+        Dictionary<int, double> movieListWithAvgGrade = new Dictionary<int, double>();
+        foreach (var movie in movieList)
+        {
+            double avgGrade = GetAverageRateOfMovie(movie);
+            movieListWithAvgGrade.Add(movie, avgGrade);
+        }
+        
+        List<int> movies = new List<int>();
+        for (int i = 0; i < amount; i++)
+        {
+            if (i >= movieList.Count())
+            {
+                break;
+            }
+            var keyOfMaxValue = movieListWithAvgGrade.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            movieListWithAvgGrade.Remove(keyOfMaxValue);
+            movies.Add(keyOfMaxValue);
+        }
+        
+        return movies;
     }
 
     public List<int> GetTopMoviesByReviewer(int reviewer)
