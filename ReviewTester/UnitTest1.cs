@@ -251,7 +251,60 @@ public class UnitTest1
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
     }
 
+    [Theory]
+    [MemberData(nameof(GetMoviesWithHighestNumberOfTopRatesData))]
+    public void GetMoviesWithHighestNumberOfTopRates(List<BeReview> fakeRepo,List<int> expectedresult)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = fakeRepo;
 
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        List<int> result = service.GetMoviesWithHighestNumberOfTopRates();
+        //Assert
+        result.Sort();
+        expectedresult.Sort();
+        Assert.Equal(result,expectedresult);
+        Assert.True(result.Count == expectedresult.Count);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+    }
+    public static IEnumerable<Object> GetMoviesWithHighestNumberOfTopRatesData()
+    {
+        
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 2, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 2, Grade = 2, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 3, Movie = 1, Grade = 4, ReviewDate = DateTime.Now }}),
+            new List<int>()
+        };
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 3, Movie = 1, Grade = 5, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{2})
+        };
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 3, Movie = 5, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 4, Movie = 5, Grade = 5, ReviewDate = DateTime.Now }}),
+                new List<int>(new[] { 5, 4 })        
+                
+        };
+        
+        
+    }
+    
+    
+    
+    
+    
     #region TestRegion for MemberData
     [Theory]
     [MemberData(nameof(GetData))]

@@ -110,7 +110,38 @@ public class ReviewService : IReviewService
 
     public List<int> GetMoviesWithHighestNumberOfTopRates()
     {
-        throw new NotImplementedException();
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
+        allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
+        List<int> onlyMovies = new List<int>();
+        foreach (var beReview in allBeReviews)
+        {
+            onlyMovies.Add(beReview.Movie);
+        }
+
+        
+        List<int> topRatedMovies = new List<int>();
+        int mostRatedMovie = onlyMovies.GroupBy(i=>i).OrderByDescending(grp=>grp.Count())
+            .Select(grp=>grp.Key).First();
+        
+        topRatedMovies.Add(mostRatedMovie);
+        onlyMovies.Remove(mostRatedMovie);
+        
+
+        int movieId = 0;
+        while (onlyMovies.Count !=0 )
+        {
+            movieId = onlyMovies.GroupBy(i=>i).OrderByDescending(grp=>grp.Count())
+                .Select(grp=>grp.Key).First();
+
+            if (movieId == mostRatedMovie)
+            {
+                topRatedMovies.Add(movieId);
+                onlyMovies.Remove(movieId);
+            }else
+                break;
+        }
+
+        return topRatedMovies;
     }
 
     public List<int> GetMostProductiveReviewers()
