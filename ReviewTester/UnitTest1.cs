@@ -303,6 +303,54 @@ public class UnitTest1
     
     
     
+    [Theory]
+    [MemberData(nameof(GetMostProductiveReviewersData))]
+    public void GetMostProductiveReviewers(List<BeReview> fakeRepo,List<int> expectedresult)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = fakeRepo;
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        List<int> result = service.GetMostProductiveReviewers();
+        //Assert
+        result.Sort();
+        expectedresult.Sort();
+        Assert.Equal(expectedresult,result);
+        Assert.True(result.Count == expectedresult.Count);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+    }
+    public static IEnumerable<Object> GetMostProductiveReviewersData()
+    {
+        
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 1, Grade = 5, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{2})
+        };
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 5, Movie = 1, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 3, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 2, Movie = 5, Grade = 5, ReviewDate = DateTime.Now }}),
+                new List<int>(new[] { 2, 5 })        
+                
+        };
+        
+        
+    }
+    
+    
+    
+    
+    
+    
     
     
     #region TestRegion for MemberData
