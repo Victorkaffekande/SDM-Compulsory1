@@ -1,7 +1,9 @@
+using System.Globalization;
 using Moq;
 using SDM_Compulsory1.Interface;
 using SDM_Compulsory1.Model;
 using SDM_Compulsory1.Service;
+using Range = System.Range;
 
 namespace ReviewTester;
 
@@ -205,7 +207,7 @@ public class UnitTest1
         Assert.Equal(expectedResult, result);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
     }
-
+    
     [Theory]
     [InlineData(2,4,2)]
     [InlineData(1,3,0)]
@@ -248,4 +250,47 @@ public class UnitTest1
         Assert.Equal(expected, ex.Message);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
     }
-}
+
+
+    #region TestRegion for MemberData
+    [Theory]
+    [MemberData(nameof(GetData))]
+    public void TestOfMemberData(List<BeReview> fakeRepo,List<int> test)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = fakeRepo;
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        double result = service.GetAverageRateOfMovie(test[0]);
+        //Assert
+        
+        Assert.Equal(test[1], result);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
+            
+    }
+
+    public static IEnumerable<Object> GetData()
+    {
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{1,2})
+        };
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 3, Movie = 5, Grade = 4, ReviewDate = DateTime.Now }}),
+            new List<int>(new []{5,4})
+        };
+        
+
+    }
+    #endregion
+    }
