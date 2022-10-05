@@ -360,8 +360,7 @@ public class UnitTest1
         
         List<int> result = service.GetTopRatedMovies(amount[0]);
         //Assert
-        result.Sort();
-        expectedresult.Sort();
+        
         Assert.Equal(expectedresult,result);
         Assert.True(result.Count == expectedresult.Count);
         
@@ -379,12 +378,12 @@ public class UnitTest1
         };
         yield return new object[]
         {
-            new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 5, Movie = 1, Grade = 5, ReviewDate = DateTime.Now },
+            new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 3, ReviewDate = DateTime.Now },
+                new BeReview { Reviewer = 5, Movie = 1, Grade = 4, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 3, Grade = 5, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 2, Movie = 5, Grade = 2, ReviewDate = DateTime.Now }}),
+                new BeReview { Reviewer = 2, Movie = 3, Grade = 4, ReviewDate = DateTime.Now }}),
             new List<int>(new []{2}),
-            new List<int>(new[] { 1, 3 })        
+            new List<int>(new[] { 3, 1 })        
                 
         };
     }
@@ -406,6 +405,59 @@ public class UnitTest1
         Assert.Equal("Amount can not be below 0",ex.Message);
         mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    [Theory]
+    [MemberData(nameof(GetTopMoviesByReviewerData))]
+    public void GetTopMoviesByReviewer(List<BeReview> fakeRepo, List<int> reviewer,List<int> expectedresult)
+    {
+        //Arange
+        //FAKE DB simulation
+        List<BeReview> data = fakeRepo;
+
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
+        
+        List<int> result = service.GetTopMoviesByReviewer(reviewer[0]);
+        //Assert
+        
+        Assert.Equal(expectedresult,result);
+        Assert.True(result.Count == expectedresult.Count);
+        
+    }
+    public static IEnumerable<Object> GetTopMoviesByReviewerData()
+    {
+        
+        yield return new object[]
+        {
+            new List<BeReview>(new []{  
+                new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, //filler to make sure not included
+                new BeReview { Reviewer = 2, Movie = 3, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, // 1
+                new BeReview { Reviewer = 2, Movie = 4, Grade = 5, ReviewDate = DateTime.Now.AddDays(-9) }, // 2
+                new BeReview { Reviewer = 2, Movie = 5, Grade = 2, ReviewDate = DateTime.Now.AddDays(-10) }, // 4
+                new BeReview { Reviewer = 2, Movie = 6, Grade = 4, ReviewDate = DateTime.Now.AddDays(-10) }}), // 3
+            new List<int>(new []{2}), // reviewer id
+            new List<int>(new []{3, 4, 6, 5}) // movies id expected results
+        };
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
