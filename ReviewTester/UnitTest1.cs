@@ -393,7 +393,7 @@ public class UnitTest1
     public void GetTopRatedMoviesInvalidAmount()
     {
         //Arange
-        //FAKE DB simulation
+        
         //arrange
         
         Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
@@ -448,6 +448,20 @@ public class UnitTest1
         };
     }
     
+    [Fact]
+    public void GetTopMoviesByInvalidReviewer()
+    {
+        //Arange
+        var reviewer = -1;
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        Action action = () => service.GetTopMoviesByReviewer(reviewer);
+        
+        //Assert
+        var ex = Assert.Throws<ArgumentException>(action);
+        Assert.Equal("Reviewer can not be below 0",ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
+    }
     
     
     
@@ -499,8 +513,6 @@ public class UnitTest1
                 new BeReview { Reviewer = 3, Movie = 5, Grade = 4, ReviewDate = DateTime.Now }}),
             new List<int>(new []{5,4})
         };
-        
-
     }
     #endregion
     }

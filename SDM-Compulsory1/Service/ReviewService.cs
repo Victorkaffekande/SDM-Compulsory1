@@ -1,7 +1,6 @@
-
-﻿using System.Collections.Concurrent;
- using System.Collections.Immutable;
- using SDM_Compulsory1.Interface;
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using SDM_Compulsory1.Interface;
 using SDM_Compulsory1.Model;
 
 namespace SDM_Compulsory1.Service;
@@ -47,8 +46,7 @@ public class ReviewService : IReviewService
         double totalGrade = 0;
         double counter = 0;
 
-        
-        
+
         foreach (var review in allReviewByReviewer)
         {
             if (review.Reviewer.Equals(reviewer))
@@ -115,36 +113,38 @@ public class ReviewService : IReviewService
     public List<int> GetMoviesWithHighestNumberOfTopRates()
     {
         List<BeReview> allBeReviews = _repo.GetAllBeReviews();
-         allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
+        allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
 
-         List<int> movieIdList = new List<int>();
-         foreach (var review in allBeReviews)
-         {
-             if (!movieIdList.Contains(review.Movie))
-             {
-                 movieIdList.Add(review.Movie);
-             }
-         }
-         int count = 0;
-         int biggestMovie = 0;
-         List<int> bestMovies = new List<int>();
-         
-         foreach (var movie in movieIdList)
-         {
-             count = allBeReviews.FindAll(bereview => bereview.Movie.Equals(movie)).Count;
+        List<int> movieIdList = new List<int>();
+        foreach (var review in allBeReviews)
+        {
+            if (!movieIdList.Contains(review.Movie))
+            {
+                movieIdList.Add(review.Movie);
+            }
+        }
 
-             if (count > biggestMovie)
-             {
-                 biggestMovie = count;
-                 bestMovies.Clear();
-                 bestMovies.Add(movie);
-             }else if (count == biggestMovie)
-             {
-                 bestMovies.Add(movie);
-             }
-         }
+        int count = 0;
+        int biggestMovie = 0;
+        List<int> bestMovies = new List<int>();
 
-         return bestMovies;
+        foreach (var movie in movieIdList)
+        {
+            count = allBeReviews.FindAll(bereview => bereview.Movie.Equals(movie)).Count;
+
+            if (count > biggestMovie)
+            {
+                biggestMovie = count;
+                bestMovies.Clear();
+                bestMovies.Add(movie);
+            }
+            else if (count == biggestMovie)
+            {
+                bestMovies.Add(movie);
+            }
+        }
+
+        return bestMovies;
     }
 
     public List<int> GetMostProductiveReviewers()
@@ -156,9 +156,9 @@ public class ReviewService : IReviewService
         foreach (var r in reviewerList)
         {
             var count = allReviews.Where(x => x.Reviewer == r).Select(x => x).Count();
-            map.TryAdd(r,count);
+            map.TryAdd(r, count);
         }
-        
+
         List<int> countList = new List<int>(map.Keys);
         countList.Sort();
         countList.Reverse();
@@ -171,15 +171,15 @@ public class ReviewService : IReviewService
                 resultList.Add(r);
             }
         }
+
         return resultList;
     }
 
     public List<int> GetTopRatedMovies(int amount)
     {
-        if (amount < 0)
-        {
-            throw new ArgumentException("Amount can not be below 0");
-        }
+        if (amount < 0) throw new ArgumentException("Amount can not be below 0");
+        
+
         List<BeReview> allBereviews = _repo.GetAllBeReviews();
         var movieList = allBereviews.Select(x => x.Movie).Distinct();
 
@@ -189,7 +189,7 @@ public class ReviewService : IReviewService
             double avgGrade = GetAverageRateOfMovie(movie);
             movieListWithAvgGrade.Add(movie, avgGrade);
         }
-        
+
         List<int> movies = new List<int>();
         for (int i = 0; i < amount; i++)
         {
@@ -197,17 +197,29 @@ public class ReviewService : IReviewService
             {
                 break;
             }
+
             var keyOfMaxValue = movieListWithAvgGrade.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
             movieListWithAvgGrade.Remove(keyOfMaxValue);
             movies.Add(keyOfMaxValue);
         }
-        
+
         return movies;
     }
 
     public List<int> GetTopMoviesByReviewer(int reviewer)
     {
-        throw new NotImplementedException();
+        if (reviewer < 0) throw new ArgumentException("Reviewer can not be below 0");
+        
+        var allReviews = _repo.GetAllBeReviews().Where(r => r.Reviewer == reviewer);
+        List<int> resultList = new List<int>();
+        for (int i = 5; i > 0; i--)
+        {
+            var sublist = new List<BeReview>(allReviews.Where(b => b.Grade == i));
+            sublist.Sort((x, y) => x.ReviewDate.CompareTo(y.ReviewDate));
+            resultList.AddRange(sublist.Select(r => r.Movie));
+        }
+
+        return resultList;
     }
 
     public List<int> GetReviewersByMovie(int movie)
