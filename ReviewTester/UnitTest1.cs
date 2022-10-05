@@ -390,6 +390,22 @@ public class UnitTest1
     }
     
     
+    [Fact]
+    public void GetTopRatedMoviesInvalidAmount()
+    {
+        //Arange
+        //FAKE DB simulation
+        //arrange
+        
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        Action action = () => service.GetTopRatedMovies(-1);
+        
+        //Assert
+        var ex = Assert.Throws<ArgumentException>(action);
+        Assert.Equal("Amount can not be below 0",ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
+    }
     
     
     

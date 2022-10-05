@@ -47,7 +47,8 @@ public class ReviewService : IReviewService
         double totalGrade = 0;
         double counter = 0;
 
-
+        
+        
         foreach (var review in allReviewByReviewer)
         {
             if (review.Reviewer.Equals(reviewer))
@@ -175,7 +176,10 @@ public class ReviewService : IReviewService
 
     public List<int> GetTopRatedMovies(int amount)
     {
-
+        if (amount < 0)
+        {
+            throw new ArgumentException("Amount can not be below 0");
+        }
         List<BeReview> allBereviews = _repo.GetAllBeReviews();
         var movieList = allBereviews.Select(x => x.Movie).Distinct();
 
