@@ -44,20 +44,17 @@ public class ReviewService : IReviewService
 
         return totalGrade / counter;
     }
-
+    
     public int GetNumberOfRatesByReviewer(int reviewer, int rate)
     {
+        //Checks  for reviewer id is not 0 or below 0
         if (reviewer <= 0) throw new ArgumentException("Reviewer can not be negative");
 
+        //checks if rate is below 1 or greater 5 
+        if (rate < 1 || rate > 5) throw new ArgumentException("Rate must between 1 & 5");
 
-        if (rate <= 0 || rate >= 6) throw new ArgumentException("Rate must between 1 & 5");
-
-        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
-        List<BeReview> allReviewByReviewer =
-            allBeReviews.FindAll(beReview => beReview.Reviewer.Equals(reviewer) && beReview.Grade.Equals(rate));
-
-
-        return allReviewByReviewer.Count;
+        // gets all reviews from DB, sort by reviewer and grade. returns the count of reviews with specific rating
+        return _repo.GetAllBeReviews().FindAll(beReview => beReview.Reviewer.Equals(reviewer) && beReview.Grade.Equals(rate)).Count;
     }
 
     public int GetNumberOfReviews(int movie)
