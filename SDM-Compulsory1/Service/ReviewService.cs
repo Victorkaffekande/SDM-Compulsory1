@@ -16,22 +16,8 @@ public class ReviewService : IReviewService
 
     public int GetNumberOfReviewsFromReviewer(int reviewer)
     {
-        if (reviewer <= 0)
-        {
-            throw new ArgumentException("Id can not be negative or 0");
-        }
-
-        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
-        int count = 0;
-        foreach (var review in allBeReviews)
-        {
-            if (review.Reviewer.Equals(reviewer))
-            {
-                count++;
-            }
-        }
-
-        return count;
+        if (reviewer <= 0) throw new ArgumentException("Id can not be negative or 0");
+        return _repo.GetAllBeReviews().Where(r => r.Reviewer == reviewer).Count();
     }
 
     public double GetAverageRateFromReviewer(int reviewer)
@@ -177,26 +163,24 @@ public class ReviewService : IReviewService
 
     public List<int> GetTopRatedMovies(int amount)
     {
+        //Checks for invalid input
         if (amount < 0) throw new ArgumentException("Amount can not be below 0");
         
-
-        List<BeReview> allBereviews = _repo.GetAllBeReviews();
-        var movieList = allBereviews.Select(x => x.Movie).Distinct();
-
+        //Creates list of all the movies once. no repeats
+        var movieList = _repo.GetAllBeReviews().Select(x => x.Movie).Distinct();
+        
+        //Creates dictionary where key is movie id and value is that movies avg grade
         Dictionary<int, double> movieListWithAvgGrade = new Dictionary<int, double>();
         foreach (var movie in movieList)
         {
-            double avgGrade = GetAverageRateOfMovie(movie);
-            movieListWithAvgGrade.Add(movie, avgGrade);
+            movieListWithAvgGrade.Add(movie, GetAverageRateOfMovie(movie));
         }
 
         List<int> movies = new List<int>();
         for (int i = 0; i < amount; i++)
         {
             if (i >= movieList.Count())
-            {
-                break;
-            }
+            { break; }
 
             var keyOfMaxValue = movieListWithAvgGrade.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
             movieListWithAvgGrade.Remove(keyOfMaxValue);
