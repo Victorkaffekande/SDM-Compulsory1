@@ -1,15 +1,16 @@
-using System.Globalization;
 using Moq;
 using SDM_Compulsory1.Interface;
 using SDM_Compulsory1.Model;
 using SDM_Compulsory1.Service;
-using Range = System.Range;
 
 namespace ReviewTester;
 
 public class UnitTest1
 {
 
+    /**
+     * Note that the TestCases are numbered but not according to the doc "SDM Compulsory"
+     */
     [Fact]
     public void CreateReviewService() // test case 1.1
     {
@@ -140,9 +141,9 @@ public class UnitTest1
     }
     
     [Theory]
-    [InlineData(1,0, "Rate must between 1 & 5" )]  // to low rate
-    [InlineData(1,6, "Rate must between 1 & 5")] // to high rate
-    [InlineData(-1,2 ,"Reviewer can not be negative")] // reviewer doesnt exist
+    [InlineData(1,0, "Rate must between 1 & 5" )]  // to low rate  // test case 4.4
+    [InlineData(1,6, "Rate must between 1 & 5")] // to high rate // test case 4.5
+    [InlineData(-1,2 ,"Reviewer can not be negative")] // reviewer doesnt exist // test case 4.6
     public void GetNumberOfRatesByReviewerInvalidRequest(int reviewer,int rate, string expectedMessage)
     {
         //Arange
@@ -158,9 +159,9 @@ public class UnitTest1
 
 
     [Theory]
-    [InlineData(1, 1)] 
-    [InlineData(2, 2)] 
-    [InlineData(5, 0)] 
+    [InlineData(1, 1)]  // test case 5.1
+    [InlineData(2, 2)] // test case 5.2
+    [InlineData(5, 0)] // test case 5.3
     
     public void GetNumberOfReviewsFromValidMovie(int movie, int expectedResult)
 
@@ -185,9 +186,9 @@ public class UnitTest1
     
     
     [Theory]
-    [InlineData(1, 2)] 
-    [InlineData(2, 4.5)] 
-    [InlineData(5, 0)] 
+    [InlineData(1, 2)] // test case 6.1
+    [InlineData(2, 4.5)] // test case 6.2
+    [InlineData(5, 0)] // test case 6.3
     public void GetAverageRateOfMovieTest(int movie, double expectedResult)
     {
         //Arange
@@ -209,9 +210,9 @@ public class UnitTest1
     }
     
     [Theory]
-    [InlineData(2,4,2)]
-    [InlineData(1,3,0)]
-    [InlineData(1,2,1)]
+    [InlineData(2,4,2)] // test case 7.1
+    [InlineData(1,3,0)]// test case 7.2
+    [InlineData(1,2,1)]// test case 7.3
     public void GetNumberOfValidRates(int movie,int rate,int expected)
     {
         //arrange
@@ -233,10 +234,10 @@ public class UnitTest1
     }
     
     [Theory]
-    [InlineData(0,4,"MovieId can not be negative or zero")]//invalid movie
-    [InlineData(-1,4,"MovieId can not be negative or zero")]//invalid movie
-    [InlineData(1,0,"Rate must be between 1 and 5")]//invalid rate low
-    [InlineData(1,6,"Rate must be between 1 and 5")]//invalid rate high
+    [InlineData(0,4,"MovieId can not be negative or zero")]//invalid movie // test case 7.4
+    [InlineData(-1,4,"MovieId can not be negative or zero")]//invalid movie // test case 7.5
+    [InlineData(1,0,"Rate must be between 1 and 5")]//invalid rate low // test case 7.6
+    [InlineData(1,6,"Rate must be between 1 and 5")]//invalid rate high // test case 7.7
     public void GetNumberOfInvalidRates(int movie,int rate,String expected)
     {
         Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
@@ -252,7 +253,7 @@ public class UnitTest1
     }
 
     [Theory]
-    [MemberData(nameof(GetMoviesWithHighestNumberOfTopRatesData))]
+    [MemberData(nameof(GetMoviesWithHighestNumberOfTopRatesData))] // test cases for 8 
     public void GetMoviesWithHighestNumberOfTopRates(List<BeReview> fakeRepo,List<int> expectedresult)
     {
         //Arange
@@ -274,21 +275,21 @@ public class UnitTest1
     public static IEnumerable<Object> GetMoviesWithHighestNumberOfTopRatesData()
     {
         
-        yield return new object[]
+        yield return new object[] // test case 8.1
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 2, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 2, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 3, Movie = 1, Grade = 4, ReviewDate = DateTime.Now }}),
             new List<int>()
         };
-        yield return new object[]
+        yield return new object[] // test case 8.2
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 3, Movie = 1, Grade = 5, ReviewDate = DateTime.Now }}),
             new List<int>(new []{2})
         };
-        yield return new object[]
+        yield return new object[] // test case 8.3
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
@@ -304,7 +305,7 @@ public class UnitTest1
     
     
     [Theory]
-    [MemberData(nameof(GetMostProductiveReviewersData))]
+    [MemberData(nameof(GetMostProductiveReviewersData))] // test case 9
     public void GetMostProductiveReviewers(List<BeReview> fakeRepo,List<int> expectedresult)
     {
         //Arange
@@ -326,14 +327,14 @@ public class UnitTest1
     public static IEnumerable<Object> GetMostProductiveReviewersData()
     {
         
-        yield return new object[]
+        yield return new object[] // test case 9.1
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 1, Grade = 5, ReviewDate = DateTime.Now }}),
             new List<int>(new []{2})
         };
-        yield return new object[]
+        yield return new object[] // test case 9.2
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 5, Movie = 1, Grade = 5, ReviewDate = DateTime.Now },
@@ -347,7 +348,7 @@ public class UnitTest1
     
     
     [Theory]
-    [MemberData(nameof(GetTopRatedMoviesData))]
+    [MemberData(nameof(GetTopRatedMoviesData))] // test case 10
     public void GetTopRatedMovies(List<BeReview> fakeRepo, List<int> amount,List<int> expectedresult)
     {
         //Arange
@@ -368,7 +369,7 @@ public class UnitTest1
     public static IEnumerable<Object> GetTopRatedMoviesData()
     {
         
-        yield return new object[]
+        yield return new object[] // test case 10.1
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 2, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
@@ -376,7 +377,7 @@ public class UnitTest1
             new List<int>(new []{1}),
             new List<int>(new []{2})
         };
-        yield return new object[]
+        yield return new object[] // test case 10.2
         {
             new List<BeReview>(new []{  new BeReview { Reviewer = 5, Movie = 2, Grade = 3, ReviewDate = DateTime.Now },
                 new BeReview { Reviewer = 5, Movie = 1, Grade = 4, ReviewDate = DateTime.Now },
@@ -389,7 +390,7 @@ public class UnitTest1
     }
     
     
-    [Fact]
+    [Fact] // test case 10.3
     public void GetTopRatedMoviesInvalidAmount()
     {
         //Arange
@@ -407,14 +408,8 @@ public class UnitTest1
     }
     
     
-    
-    
-    
-    
-    
-    
     [Theory]
-    [MemberData(nameof(GetTopMoviesByReviewerData))]
+    [MemberData(nameof(GetTopMoviesByReviewerData))] // test case 11
     public void GetTopMoviesByReviewer(List<BeReview> fakeRepo, List<int> reviewer,List<int> expectedresult)
     {
         //Arange
@@ -435,7 +430,7 @@ public class UnitTest1
     public static IEnumerable<Object> GetTopMoviesByReviewerData()
     {
         
-        yield return new object[]
+        yield return new object[] // test case 11.1
         {
             new List<BeReview>(new []{  
                 new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, //filler to make sure not included
@@ -449,7 +444,7 @@ public class UnitTest1
         
     }
     
-    [Fact]
+    [Fact] // test case 11.2
     public void GetTopMoviesByInvalidReviewer()
     {
         //Arange
@@ -472,7 +467,7 @@ public class UnitTest1
     
     
     [Theory]
-    [MemberData(nameof(GetReviewersByMovieData))]
+    [MemberData(nameof(GetReviewersByMovieData))] // test case 12
     public void GetReviewersByMovie(List<BeReview> fakeRepo, List<int> movie,List<int> expectedresult)
     {
         //Arange
@@ -493,7 +488,7 @@ public class UnitTest1
     public static IEnumerable<Object> GetReviewersByMovieData()
     {
         
-        yield return new object[]
+        yield return new object[] // test case 12.1
         {
             new List<BeReview>(new []{  
                 new BeReview { Reviewer = 1, Movie = 3, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, //filler to make sure not included
@@ -507,7 +502,7 @@ public class UnitTest1
     }
     
     
-    [Fact]
+    [Fact] // test case 12.2
     public void GetReviewersByMovieInvalidMovieId()
     {
         //Arange
