@@ -98,8 +98,7 @@ public class ReviewService : IReviewService
 
     public List<int> GetMoviesWithHighestNumberOfTopRates()
     {
-        List<BeReview> allBeReviews = _repo.GetAllBeReviews();
-        allBeReviews = allBeReviews.FindAll(bereview => bereview.Grade.Equals(5));
+        List<BeReview> allBeReviews = _repo.GetAllBeReviews().FindAll(bereview => bereview.Grade.Equals(5));
 
         List<int> movieIdList = new List<int>();
         foreach (var review in allBeReviews)
@@ -125,9 +124,7 @@ public class ReviewService : IReviewService
                 bestMovies.Add(movie);
             }
             else if (count == biggestMovie)
-            {
-                bestMovies.Add(movie);
-            }
+            { bestMovies.Add(movie); }
         }
 
         return bestMovies;
