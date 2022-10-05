@@ -224,6 +224,17 @@ public class ReviewService : IReviewService
 
     public List<int> GetReviewersByMovie(int movie)
     {
-        throw new NotImplementedException();
+        if (movie < 0) throw new ArgumentException("Movie id can not be below 0");
+        
+        var allReviews = _repo.GetAllBeReviews().Where(r => r.Movie == movie);
+        List<int> resultList = new List<int>();
+        for (int i = 5; i > 0; i--)
+        {
+            var sublist = new List<BeReview>(allReviews.Where(b => b.Grade == i));
+            sublist.Sort((x, y) => x.ReviewDate.CompareTo(y.ReviewDate));
+            resultList.AddRange(sublist.Select(r => r.Reviewer));
+        }
+
+        return resultList;
     }
 }

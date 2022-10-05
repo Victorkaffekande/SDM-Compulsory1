@@ -446,6 +446,7 @@ public class UnitTest1
             new List<int>(new []{2}), // reviewer id
             new List<int>(new []{3, 4, 6, 5}) // movies id expected results
         };
+        
     }
     
     [Fact]
@@ -470,16 +471,9 @@ public class UnitTest1
     
     
     
-    
-    
-    
-    
-    
-    
-    #region TestRegion for MemberData
     [Theory]
-    [MemberData(nameof(GetData))]
-    public void TestOfMemberData(List<BeReview> fakeRepo,List<int> test)
+    [MemberData(nameof(GetReviewersByMovieData))]
+    public void GetReviewersByMovie(List<BeReview> fakeRepo, List<int> movie,List<int> expectedresult)
     {
         //Arange
         //FAKE DB simulation
@@ -489,30 +483,42 @@ public class UnitTest1
         ReviewService service = new ReviewService(mockRepo.Object);
         mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
         
-        double result = service.GetAverageRateOfMovie(test[0]);
+        List<int> result = service.GetReviewersByMovie(movie[0]);
         //Assert
         
-        Assert.Equal(test[1], result);
-        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Once);
-            
+        Assert.Equal(expectedresult,result);
+        Assert.True(result.Count == expectedresult.Count);
+        
     }
-
-    public static IEnumerable<Object> GetData()
+    public static IEnumerable<Object> GetReviewersByMovieData()
     {
+        
         yield return new object[]
         {
-            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 3, Movie = 1, Grade = 2, ReviewDate = DateTime.Now }}),
-            new List<int>(new []{1,2})
-        };
-        yield return new object[]
-        {
-            new List<BeReview>(new []{  new BeReview { Reviewer = 1, Movie = 2, Grade = 5, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 1, Movie = 2, Grade = 4, ReviewDate = DateTime.Now },
-                new BeReview { Reviewer = 3, Movie = 5, Grade = 4, ReviewDate = DateTime.Now }}),
-            new List<int>(new []{5,4})
+            new List<BeReview>(new []{  
+                new BeReview { Reviewer = 1, Movie = 3, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, //filler to make sure not included
+                new BeReview { Reviewer = 2, Movie = 5, Grade = 5, ReviewDate = DateTime.Now.AddDays(-10) }, // 1
+                new BeReview { Reviewer = 3, Movie = 5, Grade = 5, ReviewDate = DateTime.Now.AddDays(-9) }, // 2
+                new BeReview { Reviewer = 4, Movie = 5, Grade = 2, ReviewDate = DateTime.Now.AddDays(-10) }, // 4
+                new BeReview { Reviewer = 5, Movie = 5, Grade = 4, ReviewDate = DateTime.Now.AddDays(-10) }}), // 3
+            new List<int>(new []{5}), // movie id
+            new List<int>(new []{2, 3, 5, 4}) // reviewer id expected results
         };
     }
-    #endregion
+    
+    
+    [Fact]
+    public void GetReviewersByMovieInvalidMovieId()
+    {
+        //Arange
+        var movie = -1;
+        Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
+        ReviewService service = new ReviewService(mockRepo.Object);
+        Action action = () => service.GetReviewersByMovie(movie);
+        
+        //Assert
+        var ex = Assert.Throws<ArgumentException>(action);
+        Assert.Equal("Movie id can not be below 0",ex.Message);
+        mockRepo.Verify(r => r.GetAllBeReviews(), Times.Never);
     }
+}
