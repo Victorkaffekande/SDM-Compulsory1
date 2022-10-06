@@ -410,23 +410,21 @@ public class UnitTest1
     public void GetTopMoviesByReviewer(List<BeReview> fakeRepo, List<int> reviewer,List<int> expectedresult)
     {
         //Arange
-        //FAKE DB simulation
         List<BeReview> data = fakeRepo;
-
         Mock<IReviewRepository> mockRepo = new Mock<IReviewRepository>();
         ReviewService service = new ReviewService(mockRepo.Object);
         mockRepo.Setup(r => r.GetAllBeReviews()).Returns(() => data);
         
+        //act
         List<int> result = service.GetTopMoviesByReviewer(reviewer[0]);
-        //Assert
         
+        //Assert
         Assert.Equal(expectedresult,result);
         Assert.True(result.Count == expectedresult.Count);
         
     }
     public static IEnumerable<Object> GetTopMoviesByReviewerData()
     {
-        
         yield return new object[] // test case 10.1
         {
             new List<BeReview>(new []{  
@@ -438,7 +436,6 @@ public class UnitTest1
             new List<int>(new []{2}), // reviewer id
             new List<int>(new []{3, 4, 6, 5}) // movies id expected results
         };
-        
     }
     
     [Fact] // test case 10.2
